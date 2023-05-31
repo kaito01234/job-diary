@@ -1,11 +1,23 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { PrismaClient } from '@prisma/client';
 import type { AuthOptions, SessionStrategy } from 'next-auth';
+import type { Adapter, AdapterUser } from 'next-auth/adapters';
 import EmailProvider from 'next-auth/providers/email';
 import GithubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
 
 const prisma = new PrismaClient();
+
+export const prismaAdapter: Adapter = {
+  ...PrismaAdapter(prisma),
+
+  getUserByEmail: () => null,
+
+  createUser: async (data) => {
+    const user = await prisma.user.create({ data: { ...data, email: null } });
+    return user as AdapterUser;
+  },
+};
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -24,7 +36,7 @@ export const authOptions: AuthOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: 'jwt' as SessionStrategy },
-  adapter: PrismaAdapter(prisma),
+  adapter: prismaAdapter,
   callbacks: {
     session: async ({ session, token }) => {
       if (session?.user) {
@@ -37,6 +49,9 @@ export const authOptions: AuthOptions = {
         token.uid = user.id;
       }
       return token;
+    },
+    async redirect({ baseUrl }) {
+      return `${baseUrl}/signup`;
     },
   },
 };
