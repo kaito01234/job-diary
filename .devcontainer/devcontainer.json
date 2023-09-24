@@ -6,6 +6,9 @@
   "remoteEnv": {
     "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
   },
+  "forwardPorts": [3000],
+  "postCreateCommand": ".devcontainer/postCreateCommand.sh",
+  // "postStartCommand": ".devcontainer/postStartCommand.sh",
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "moby": true,
@@ -17,7 +20,6 @@
       "version": "latest"
     }
   },
-  "postCreateCommand": "volta setup",
   "customizations": {
     "vscode": {
       "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
